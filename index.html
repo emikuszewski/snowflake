@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlainID Snowflake Authorizer - Technical Documentation</title>
+    <title>PlainID Snowflake Policy Orchestration - Technical Documentation</title>
     <style>
         * {
             margin: 0;
@@ -22,27 +22,9 @@
             --info: #0284c7;
             --main-bg: #ffffff;
             --box-bg: #ffffff;
-            --table-header-bg: #f8fafc;
+            --pop-color: #8b5cf6;
             --flow-bg-start: #f8fafc;
             --flow-bg-end: #e2e8f0;
-            --svg-text: white;
-        }
-
-        [data-theme="dark"] {
-            --primary: #4d94ff;
-            --code-bg: #0f172a;
-            --border: #334155;
-            --text: #cbd5e1;
-            --sidebar-bg: #1e293b;
-            --accent: #10b981;
-            --warning: #ef4444;
-            --info: #38bdf8;
-            --main-bg: #0f172a;
-            --box-bg: #1e293b;
-            --table-header-bg: #334155;
-            --flow-bg-start: #1e293b;
-            --flow-bg-end: #334155;
-            --svg-text: #cbd5e1;
         }
 
         body {
@@ -53,43 +35,6 @@
             height: 100vh;
             overflow: hidden;
             background: var(--main-bg);
-        }
-
-        /* Dark Mode Toggle */
-        .theme-toggle {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 1000;
-            background: var(--box-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .theme-toggle svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--text);
-        }
-
-        .theme-toggle .sun {
-            display: none;
-        }
-
-        [data-theme="dark"] .theme-toggle .moon {
-            display: none;
-        }
-
-        [data-theme="dark"] .theme-toggle .sun {
-            display: block;
         }
 
         /* Sidebar */
@@ -239,6 +184,11 @@
             border-color: var(--accent);
         }
 
+        .alert.pop {
+            background: #faf5ff;
+            border-color: var(--pop-color);
+        }
+
         /* Architecture Diagram */
         .architecture {
             background: var(--box-bg);
@@ -271,13 +221,98 @@
             background: var(--box-bg);
         }
 
-        [data-theme="dark"] .component.primary {
-            background: #1e3a5f;
+        .component.pop {
+            border-color: var(--pop-color);
+            background: #faf5ff;
         }
 
         .arrow {
             color: var(--primary);
             font-size: 1.5rem;
+        }
+
+        /* POP Flow Diagram */
+        .pop-flow {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .pop-stages {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .pop-stage {
+            background: white;
+            border: 2px solid var(--pop-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .pop-stage:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(139, 92, 246, 0.2);
+        }
+
+        .pop-stage-number {
+            background: var(--pop-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .pop-stage-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--pop-color);
+        }
+
+        .pop-stage-desc {
+            font-size: 0.875rem;
+            color: var(--text);
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: inline-flex;
+            background: var(--sidebar-bg);
+            border-radius: 6px;
+            padding: 4px;
+            margin: 1rem 0;
+        }
+
+        .mode-toggle button {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .mode-toggle button.active {
+            background: white;
+            color: var(--pop-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         /* Visual Flow Diagrams */
@@ -455,75 +490,6 @@
             color: var(--primary);
         }
 
-        /* Data Flow Animation */
-        .data-flow-visual {
-            background: #0f172a;
-            border-radius: 12px;
-            padding: 3rem;
-            margin: 2rem 0;
-            position: relative;
-            min-height: 400px;
-            overflow: hidden;
-        }
-
-        .flow-particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #60a5fa;
-            border-radius: 50%;
-            animation: flowAnimation 4s linear infinite;
-            box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
-        }
-
-        @keyframes flowAnimation {
-            0% { left: 10%; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { left: 90%; opacity: 0; }
-        }
-
-        .flow-step {
-            display: flex;
-            align-items: center;
-            margin: 2rem 0;
-            position: relative;
-            z-index: 2;
-        }
-
-        .flow-step-number {
-            background: var(--primary);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            margin-right: 1rem;
-            flex-shrink: 0;
-        }
-
-        .flow-step-content {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            padding: 1rem;
-            color: white;
-            flex: 1;
-        }
-
-        .flow-step-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .flow-step-desc {
-            font-size: 0.875rem;
-            color: rgba(255,255,255,0.7);
-        }
-
         /* Tabs */
         .tabs {
             display: flex;
@@ -566,7 +532,7 @@
             margin: 0.5rem 0;
         }
 
-        /* API Endpoint */
+        /* Endpoint */
         .endpoint {
             background: var(--sidebar-bg);
             border: 1px solid var(--border);
@@ -591,39 +557,22 @@
     </style>
 </head>
 <body>
-    <!-- Dark Mode Toggle -->
-    <button class="theme-toggle" onclick="toggleTheme()">
-        <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-        <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <circle cx="12" cy="12" r="5" fill="currentColor"/>
-            <line x1="12" y1="1" x2="12" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="23"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-            <line x1="1" y1="12" x2="3" y2="12"/>
-            <line x1="21" y1="12" x2="23" y2="12"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-    </button>
-
     <!-- Sidebar Navigation -->
     <nav class="sidebar">
-        <h3>Architecture</h3>
+        <h3>Policy Orchestration</h3>
         <ul>
             <li><a href="#overview" class="active">System Overview</a></li>
-            <li><a href="#components">Core Components</a></li>
-            <li><a href="#data-flow">Data Flow</a></li>
+            <li><a href="#pop-architecture">POP Architecture</a></li>
+            <li><a href="#snowflake-pop">Snowflake POP</a></li>
+            <li><a href="#modes">Learn & Manage Modes</a></li>
         </ul>
 
         <h3>Configuration</h3>
         <ul>
-            <li><a href="#paa-setup">PAA Setup</a></li>
-            <li><a href="#pip-config">PIP Configuration</a></li>
-            <li><a href="#pdp-config">PDP Configuration</a></li>
-            <li><a href="#snowflake-integration">Snowflake Integration</a></li>
+            <li><a href="#pop-setup">POP Setup</a></li>
+            <li><a href="#discovery">Discovery Process</a></li>
+            <li><a href="#policy-mapping">Policy Mapping</a></li>
+            <li><a href="#orchestration-workspace">Orchestration Workspace</a></li>
         </ul>
 
         <h3>Authorization Patterns</h3>
@@ -634,40 +583,116 @@
             <li><a href="#column-access">Column Access Control</a></li>
         </ul>
 
-        <h3>API Reference</h3>
-        <ul>
-            <li><a href="#permit-deny">Permit/Deny API</a></li>
-            <li><a href="#policy-api">Policy Resolution API</a></li>
-            <li><a href="#token-api">Access Token API</a></li>
-        </ul>
-
         <h3>Deployment</h3>
         <ul>
-            <li><a href="#helm">Helm Deployment</a></li>
-            <li><a href="#standalone">Standalone Installation</a></li>
-            <li><a href="#caching">Caching Strategy</a></li>
+            <li><a href="#monitoring">Monitoring & Auditing</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
         </ul>
     </nav>
 
     <!-- Main Content -->
     <main class="main">
-        <h1>PlainID Snowflake Data Authorizer</h1>
-        <p>Technical documentation for implementing Policy-Based Access Control (PBAC) in Snowflake Data Cloud environments.</p>
+        <h1>PlainID Snowflake Policy Orchestration</h1>
+        <p>Technical documentation for implementing Policy Orchestration Points (POPs) for Snowflake Data Cloud environments using PlainID's SaaS Authorization Management.</p>
 
-        <div class="alert info">
-            <strong>Version:</strong> PlainID Platform 2024.1 | <strong>Pattern:</strong> Data Access Authorization | <strong>Requirements:</strong> Snowflake Enterprise+
+        <div class="alert pop">
+            <strong>Architecture Pattern:</strong> Snowflake integration uses PlainID's Policy Orchestration Point (POP) pattern for SaaS Authorization Management, enabling centralized policy discovery, management, and enforcement.
         </div>
         
-        <div class="alert warning">
-            <strong>Documentation Status:</strong> PlainID announced Snowflake Authorizer support in December 2024. Some implementation details are based on PlainID's documented patterns for data authorizers. Contact PlainID support for production deployment guidance.
+        <div class="alert info">
+            <strong>Version:</strong> PlainID Platform 2024.1+ | <strong>Feature:</strong> Snowflake Policy Orchestration Point | <strong>Announced:</strong> December 2024
         </div>
 
         <!-- System Overview -->
         <section id="overview">
             <h2>System Overview</h2>
-            <p>The PlainID Snowflake Authorizer implements fine-grained authorization through Policy Resolution endpoints, providing dynamic data access control at query execution time.</p>
+            <p>PlainID's Snowflake integration leverages Policy Orchestration to centralize Snowflake's access controls through a unified Policy-Based Access Control (PBAC) framework. The Policy Orchestration Point (POP) enables enterprises to discover, manage, and enforce data access policies across their Snowflake environments.</p>
 
-            <!-- Main Authorization Flow Visual -->
+            <!-- Core Components Architecture -->
+            <div class="architecture" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 3rem;">
+                <h3 style="margin-bottom: 2rem;">Core Components Architecture</h3>
+                
+                <!-- Main Architecture Flow -->
+                <svg viewBox="0 0 1000 450" style="width: 100%; height: auto;">
+                    <defs>
+                        <marker id="arrowhead-purple" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <polygon points="0 0, 10 3, 0 6" fill="#8b5cf6"/>
+                        </marker>
+                        <marker id="arrowhead-blue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                            <polygon points="0 0, 10 3, 0 6" fill="#0284c7"/>
+                        </marker>
+                        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+                        </filter>
+                    </defs>
+                    
+                    <!-- PlainID Cloud Section -->
+                    <g id="plainid-cloud">
+                        <rect x="50" y="50" width="400" height="200" rx="12" fill="#8b5cf6" opacity="0.1" stroke="#8b5cf6" stroke-width="2"/>
+                        <text x="250" y="80" fill="#8b5cf6" text-anchor="middle" font-size="18" font-weight="bold">PlainID Cloud Platform</text>
+                        
+                        <!-- PAP Box -->
+                        <rect x="80" y="110" width="140" height="80" rx="6" fill="#ffffff" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+                        <text x="150" y="140" text-anchor="middle" font-size="14" font-weight="bold">PAP</text>
+                        <text x="150" y="160" text-anchor="middle" font-size="11" fill="#64748b">Policy Admin Point</text>
+                        <text x="150" y="175" text-anchor="middle" font-size="10" fill="#64748b">Policy Creation</text>
+                        
+                        <!-- POP Service Box -->
+                        <rect x="260" y="110" width="160" height="80" rx="6" fill="#faf5ff" stroke="#8b5cf6" stroke-width="3" filter="url(#shadow)"/>
+                        <text x="340" y="140" text-anchor="middle" font-size="14" font-weight="bold">POP Service</text>
+                        <text x="340" y="160" text-anchor="middle" font-size="11" fill="#64748b">Orchestration Engine</text>
+                        <text x="340" y="175" text-anchor="middle" font-size="10" fill="#64748b">Discovery & Deploy</text>
+                    </g>
+                    
+                    <!-- Snowflake Environment -->
+                    <g id="snowflake-env">
+                        <rect x="550" y="50" width="400" height="350" rx="12" fill="#0284c7" opacity="0.05" stroke="#0284c7" stroke-width="2"/>
+                        <text x="750" y="80" fill="#0284c7" text-anchor="middle" font-size="18" font-weight="bold">Snowflake Environment</text>
+                        
+                        <!-- Native Policies -->
+                        <rect x="600" y="110" width="300" height="80" rx="6" fill="#ffffff" stroke="#0284c7" stroke-width="2" filter="url(#shadow)"/>
+                        <text x="750" y="140" text-anchor="middle" font-size="14" font-weight="bold">Native Snowflake Policies</text>
+                        <text x="750" y="160" text-anchor="middle" font-size="11" fill="#64748b">Row Access Policies</text>
+                        <text x="750" y="175" text-anchor="middle" font-size="10" fill="#64748b">Masking Policies</text>
+                        
+                        <!-- Snowflake Objects -->
+                        <rect x="600" y="220" width="140" height="70" rx="6" fill="#ffffff" stroke="#0284c7" stroke-width="2" filter="url(#shadow)"/>
+                        <text x="670" y="250" text-anchor="middle" font-size="13" font-weight="bold">Databases</text>
+                        <text x="670" y="270" text-anchor="middle" font-size="10" fill="#64748b">Schemas, Tables</text>
+                        
+                        <rect x="760" y="220" width="140" height="70" rx="6" fill="#ffffff" stroke="#0284c7" stroke-width="2" filter="url(#shadow)"/>
+                        <text x="830" y="250" text-anchor="middle" font-size="13" font-weight="bold">Security Objects</text>
+                        <text x="830" y="270" text-anchor="middle" font-size="10" fill="#64748b">Roles, Users</text>
+                        
+                        <!-- Query Execution -->
+                        <rect x="600" y="310" width="300" height="70" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="2" filter="url(#shadow)"/>
+                        <text x="750" y="340" text-anchor="middle" font-size="13" font-weight="bold">Query Execution Engine</text>
+                        <text x="750" y="360" text-anchor="middle" font-size="10" fill="#64748b">Enforces policies at runtime</text>
+                    </g>
+                    
+                    <!-- Connection Lines -->
+                    <g id="connections">
+                        <!-- PAP to POP -->
+                        <line x1="220" y1="150" x2="260" y2="150" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowhead-purple)"/>
+                        
+                        <!-- POP to Snowflake (Bidirectional) -->
+                        <line x1="420" y1="150" x2="600" y2="150" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arrowhead-purple)"/>
+                        <line x1="600" y1="160" x2="420" y2="160" stroke="#0284c7" stroke-width="2" marker-end="url(#arrowhead-blue)"/>
+                        <text x="510" y="145" fill="#8b5cf6" font-size="11" text-anchor="middle">Deploy Policies</text>
+                        <text x="510" y="175" fill="#0284c7" font-size="11" text-anchor="middle">Discover Objects</text>
+                        
+                        <!-- Snowflake Internal -->
+                        <line x1="750" y1="190" x2="750" y2="310" stroke="#0284c7" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrowhead-blue)"/>
+                    </g>
+                    
+                    <!-- User Icon -->
+                    <circle cx="750" cy="345" r="25" fill="#ffffff" stroke="#334155" stroke-width="2" filter="url(#shadow)"/>
+                    <text x="750" y="350" text-anchor="middle" font-size="18">👤</text>
+                    <text x="750" y="395" fill="#334155" text-anchor="middle" font-size="12">End User</text>
+                </svg>
+            </div>
+
+            <!-- End-to-End Authorization Flow -->
             <div class="flow-visual">
                 <h3 style="margin-bottom: 2rem;">End-to-End Authorization Flow</h3>
                 <div class="flow-container">
@@ -683,7 +708,7 @@
                     </div>
                     <div class="flow-node" onclick="highlightStep(3)">
                         <div class="flow-node-icon">🔐</div>
-                        <div class="flow-node-title">PlainID PDP</div>
+                        <div class="flow-node-title">PlainID POP</div>
                         <div class="flow-node-desc">Evaluates policies & resolves attributes</div>
                     </div>
                     <div class="flow-node" onclick="highlightStep(4)">
@@ -706,957 +731,633 @@
                 </div>
             </div>
 
-            <!-- Sequence Diagram -->
-            <div class="sequence-diagram">
-                <h3>Detailed Authorization Sequence</h3>
-                <div class="sequence-actors">
-                    <div class="actor">User</div>
-                    <div class="actor">Snowflake</div>
-                    <div class="actor">PlainID PAA</div>
-                    <div class="actor">PDP</div>
-                    <div class="actor">PIP</div>
-                </div>
-                <div class="sequence-messages">
-                    <div class="message" style="top: 20px; left: 50px;">
-                        <span>1. SQL Query</span>
-                        <div class="message-arrow"></div>
-                    </div>
-                    <div class="message" style="top: 60px; left: 200px;">
-                        <span>2. Call External Function</span>
-                        <div class="message-arrow"></div>
-                    </div>
-                    <div class="message" style="top: 100px; left: 380px;">
-                        <span>3. Authorization Request</span>
-                        <div class="message-arrow"></div>
-                    </div>
-                    <div class="message" style="top: 140px; left: 500px;">
-                        <span>4. Get Attributes</span>
-                        <div class="message-arrow"></div>
-                    </div>
-                    <div class="message" style="top: 180px; left: 500px; flex-direction: row-reverse;">
-                        <div class="message-arrow" style="transform: rotate(180deg);"></div>
-                        <span>5. User Context</span>
-                    </div>
-                    <div class="message" style="top: 220px; left: 380px; flex-direction: row-reverse;">
-                        <div class="message-arrow" style="transform: rotate(180deg);"></div>
-                        <span>6. Policy Decision</span>
-                    </div>
-                    <div class="message" style="top: 260px; left: 200px; flex-direction: row-reverse;">
-                        <div class="message-arrow" style="transform: rotate(180deg);"></div>
-                        <span>7. Apply Filters/Masks</span>
-                    </div>
-                    <div class="message" style="top: 300px; left: 50px; flex-direction: row-reverse;">
-                        <div class="message-arrow" style="transform: rotate(180deg);"></div>
-                        <span>8. Filtered Results</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="architecture">
-                <h3>Component Architecture</h3>
-                <div class="flow">
-                    <div class="component">
-                        <strong>PAP</strong><br>
-                        Policy Administration
-                    </div>
-                    <span class="arrow">→</span>
-                    <div class="component primary">
-                        <strong>PAA</strong><br>
-                        Policy Agent
-                    </div>
-                    <span class="arrow">→</span>
-                    <div class="component">
-                        <strong>PDP</strong><br>
-                        Decision Point
-                    </div>
-                    <span class="arrow">→</span>
-                    <div class="component">
-                        <strong>Snowflake</strong><br>
-                        Enforcement
-                    </div>
-                </div>
-            </div>
-
             <h3>Key Capabilities</h3>
             <ul>
-                <li>Real-time authorization decisions with sub-millisecond latency</li>
-                <li>Native Snowflake security integration via external functions</li>
-                <li>Policy Resolution for complex data filtering scenarios</li>
-                <li>Dynamic attribute resolution through PIP service</li>
-                <li>Distributed caching with Redis for performance optimization</li>
+                <li><strong>Policy Discovery:</strong> Automatic discovery of existing Snowflake row access policies, masking policies, and role structures</li>
+                <li><strong>Centralized Management:</strong> Single pane of glass for managing data access across multiple Snowflake accounts and warehouses</li>
+                <li><strong>Bi-directional Sync:</strong> Policies created in PlainID are deployed and enforced in Snowflake</li>
+                <li><strong>Visual Policy Mapping:</strong> Graphical representation of complex access policies</li>
+                <li><strong>Audit & Compliance:</strong> Complete visibility and audit trail of all policy changes</li>
             </ul>
         </section>
 
-        <!-- Core Components -->
-        <section id="components">
-            <h2>Core Components</h2>
+        <!-- POP Architecture -->
+        <section id="pop-architecture">
+            <h2>Policy Orchestration Point (POP) Architecture</h2>
             
-            <!-- Complete System Architecture Visual -->
-            <div class="data-flow-visual" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
-                <h3 style="color: white; text-align: center; margin-bottom: 2rem;">PlainID + Snowflake Integration Architecture</h3>
-                
-                <svg viewBox="0 0 900 600" style="width: 100%; height: auto;">
-                    <!-- Define gradients and filters -->
-                    <defs>
-                        <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-                            <polygon points="0 0, 10 3, 0 6" fill="#60a5fa"/>
-                        </marker>
-                        <marker id="arrowhead-orange" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-                            <polygon points="0 0, 10 3, 0 6" fill="#f59e0b"/>
-                        </marker>
-                        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                            <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
-                        </filter>
-                    </defs>
-                    
-                    <!-- PlainID Cloud Section -->
-                    <g id="plainid-cloud">
-                        <rect x="50" y="50" width="350" height="180" rx="12" fill="#0066cc" opacity="0.15" stroke="#0066cc" stroke-width="2"/>
-                        <text x="225" y="85" fill="white" text-anchor="middle" font-size="18" font-weight="bold">PlainID Cloud</text>
-                        
-                        <!-- PAP Box -->
-                        <rect x="80" y="120" width="100" height="70" rx="6" fill="#ffffff" stroke="#0066cc" stroke-width="2" filter="url(#shadow)"/>
-                        <text x="130" y="160" text-anchor="middle" font-size="14" font-weight="bold">PAP</text>
-                        
-                        <!-- Policy Store Box -->
-                        <rect x="220" y="120" width="120" height="70" rx="6" fill="#ffffff" stroke="#0066cc" stroke-width="2" filter="url(#shadow)"/>
-                        <text x="280" y="150" text-anchor="middle" font-size="14" font-weight="bold">Policy Store</text>
-                        <text x="280" y="170" text-anchor="middle" font-size="11" fill="#64748b">Repository</text>
-                    </g>
-                    
-                    <!-- Customer Environment Section -->
-                    <g id="customer-env">
-                        <rect x="50" y="300" width="800" height="250" rx="12" fill="#059669" opacity="0.1" stroke="#059669" stroke-width="2"/>
-                        <text x="450" y="325" fill="#059669" text-anchor="middle" font-size="13" opacity="0.7">Customer Environment</text>
-                        
-                        <!-- PAA Box -->
-                        <rect x="100" y="380" width="140" height="100" rx="6" fill="#ffffff" stroke="#059669" stroke-width="2" filter="url(#shadow)"/>
-                        <text x="170" y="410" text-anchor="middle" font-size="16" font-weight="bold">PAA</text>
-                        <line x1="110" y1="420" x2="230" y2="420" stroke="#e2e8f0" stroke-width="1"/>
-                        <text x="170" y="445" text-anchor="middle" font-size="13">PDP</text>
-                        <text x="170" y="465" text-anchor="middle" font-size="13">PIP</text>
-                        
-                        <!-- Redis Cache Box -->
-                        <rect x="300" y="380" width="100" height="100" rx="6" fill="#ffffff" stroke="#dc2626" stroke-width="2" filter="url(#shadow)"/>
-                        <text x="350" y="420" text-anchor="middle" font-size="16" font-weight="bold">Redis</text>
-                        <text x="350" y="445" text-anchor="middle" font-size="12" fill="#64748b">Cache</text>
-                        
-                        <!-- Snowflake Box -->
-                        <rect x="500" y="360" width="280" height="140" rx="6" fill="#ffffff" stroke="#0284c7" stroke-width="2" filter="url(#shadow)"/>
-                        <text x="640" y="395" text-anchor="middle" font-size="18" font-weight="bold">❄️ Snowflake</text>
-                        <line x1="520" y1="405" x2="760" y2="405" stroke="#e2e8f0" stroke-width="1"/>
-                        <text x="640" y="430" text-anchor="middle" font-size="13">External Functions</text>
-                        <text x="640" y="450" text-anchor="middle" font-size="13">Row Access Policies</text>
-                        <text x="640" y="470" text-anchor="middle" font-size="13">Masking Policies</text>
-                    </g>
-                    
-                    <!-- User Icon -->
-                    <g id="user">
-                        <circle cx="640" cy="150" r="35" fill="#ffffff" stroke="#0066cc" stroke-width="2" filter="url(#shadow)"/>
-                        <text x="640" y="160" text-anchor="middle" font-size="24">👤</text>
-                        <text x="640" y="210" fill="white" text-anchor="middle" font-size="14" font-weight="bold">User</text>
-                    </g>
-                    
-                    <!-- Connection Lines -->
-                    <g id="connections">
-                        <!-- Policy Sync: PAP to PAA -->
-                        <path d="M 130 190 Q 130 285 170 380" stroke="#60a5fa" stroke-width="2" stroke-dasharray="5,5" fill="none"/>
-                        <text x="90" y="285" fill="#60a5fa" font-size="13">Policy Sync</text>
-                        
-                        <!-- PAA to Redis -->
-                        <line x1="240" y1="430" x2="300" y2="430" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrowhead)"/>
-                        
-                        <!-- Redis to Snowflake -->
-                        <line x1="400" y1="430" x2="500" y2="430" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrowhead)"/>
-                        <text x="450" y="445" fill="#60a5fa" font-size="13" text-anchor="middle">Authorize</text>
-                        
-                        <!-- User to Snowflake -->
-                        <path d="M 640 185 L 640 360" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrowhead)" fill="none"/>
-                        <text x="655" y="270" fill="#60a5fa" font-size="13">SQL Query</text>
-                        
-                        <!-- Snowflake to PAA - Authorization Request -->
-                        <path d="M 500 400 Q 350 280 240 400" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3,3" fill="none" marker-end="url(#arrowhead-orange)"/>
-                        <text x="355" y="365" fill="#f59e0b" font-size="12" text-anchor="middle">1st Auth Check</text>
-                    </g>
-                </svg>
+            <div class="architecture">
+                <h3>SaaS Authorization Management Pattern</h3>
+                <div class="flow">
+                    <div class="component pop">
+                        <strong>PlainID Cloud</strong><br>
+                        Policy Administration<br>
+                        <small>PAP + Policy Store</small>
+                    </div>
+                    <span class="arrow">↔</span>
+                    <div class="component pop">
+                        <strong>Snowflake POP</strong><br>
+                        Orchestration Layer<br>
+                        <small>Discover & Deploy</small>
+                    </div>
+                    <span class="arrow">↔</span>
+                    <div class="component">
+                        <strong>Snowflake</strong><br>
+                        Native Policies<br>
+                        <small>Row Access & Masking</small>
+                    </div>
+                </div>
             </div>
-            
-            <h3>Policy Authorization Agent (PAA)</h3>
-            <p>Hybrid component deployed in customer environment, manages PDP and PIP services.</p>
-            
-            <div class="code">
-# PAA Configuration Structure
-apiVersion: plainid.io/v1
-kind: PolicyAuthorizationAgent
-metadata:
-  name: snowflake-paa
-  agentId: ${AGENT_ID}
-spec:
-  deployment:
-    type: hybrid
-    components:
-      - pdp
-      - pip
-  connection:
-    tenant: ${TENANT_ID}
-    secretKey: ${AGENT_SECRET_KEY}</div>
 
-            <h3>Policy Decision Point (PDP)</h3>
+            <h3>POP Components</h3>
             <table>
                 <tr>
                     <th>Component</th>
                     <th>Function</th>
-                    <th>Configuration</th>
+                    <th>Location</th>
                 </tr>
                 <tr>
-                    <td>Decision Engine</td>
-                    <td>Evaluates policies against request context</td>
-                    <td><span class="code-inline">pdp.engine.threads=10</span></td>
+                    <td>Policy Orchestration Service</td>
+                    <td>Manages bi-directional sync between PlainID and Snowflake</td>
+                    <td>PlainID Cloud</td>
                 </tr>
                 <tr>
-                    <td>Cache Layer</td>
-                    <td>Redis-based decision caching</td>
-                    <td><span class="code-inline">pdp.cache.ttl=300</span></td>
+                    <td>Discovery Engine</td>
+                    <td>Scans and maps Snowflake objects and policies</td>
+                    <td>POP Service</td>
                 </tr>
                 <tr>
-                    <td>Load Balancer</td>
-                    <td>Distributes requests across PDP instances</td>
-                    <td><span class="code-inline">pdp.replicas=3</span></td>
+                    <td>Policy Translator</td>
+                    <td>Converts between PlainID policies and Snowflake native policies</td>
+                    <td>POP Service</td>
+                </tr>
+                <tr>
+                    <td>Deployment Engine</td>
+                    <td>Applies policy changes to Snowflake environments</td>
+                    <td>POP Service</td>
                 </tr>
             </table>
 
-            <h3>Policy Information Point (PIP)</h3>
-            <p>Provides attribute resolution from external data sources for authorization decisions.</p>
-            
-            <div class="code">
-// PIP View Configuration
-{
-  "viewName": "snowflake_user_attributes",
-  "dataSources": [
-    {
-      "type": "JDBC",
-      "adapter": "snowflake",
-      "connectionString": "jdbc:snowflake://${ACCOUNT}.snowflakecomputing.com",
-      "query": "SELECT user_id, department, clearance_level FROM user_attributes"
-    }
-  ],
-  "cache": {
-    "type": "persistent",
-    "refreshInterval": 3600
-  }
-}</div>
-        </section>
-
-        <!-- Data Flow -->
-        <section id="data-flow">
-            <h2>Data Flow</h2>
-            
-            <!-- Animated Data Flow Visual -->
-            <div class="data-flow-visual">
-                <h3 style="color: white; margin-bottom: 2rem;">Real-Time Authorization Data Flow</h3>
-                
-                <div class="flow-step">
-                    <div class="flow-step-number">1</div>
-                    <div class="flow-step-content">
-                        <div class="flow-step-title">Query Initiation</div>
-                        <div class="flow-step-desc">User executes: SELECT * FROM sales_data WHERE region='US'</div>
-                    </div>
-                </div>
-                
-                <div class="flow-step">
-                    <div class="flow-step-number">2</div>
-                    <div class="flow-step-content">
-                        <div class="flow-step-title">Authorization Intercept</div>
-                        <div class="flow-step-desc">Snowflake calls plainid_authorize(user, 'sales_data', 'SELECT')</div>
-                    </div>
-                </div>
-                
-                <div class="flow-step">
-                    <div class="flow-step-number">3</div>
-                    <div class="flow-step-content">
-                        <div class="flow-step-title">Context Enrichment</div>
-                        <div class="flow-step-desc">PIP fetches user attributes: department, clearance_level, projects</div>
-                    </div>
-                </div>
-                
-                <div class="flow-step">
-                    <div class="flow-step-number">4</div>
-                    <div class="flow-step-content">
-                        <div class="flow-step-title">Policy Evaluation</div>
-                        <div class="flow-step-desc">PDP evaluates: Can user in 'Finance' see 'US' sales with clearance level 2?</div>
-                    </div>
-                </div>
-                
-                <div class="flow-step">
-                    <div class="flow-step-number">5</div>
-                    <div class="flow-step-content">
-                        <div class="flow-step-title">Decision & Enforcement</div>
-                        <div class="flow-step-desc">Returns: PERMIT with obligations - mask SSN, filter by user's territories</div>
-                    </div>
-                </div>
-                
-                <!-- Animated particles -->
-                <div class="flow-particle" style="animation-delay: 0s; top: 80px;"></div>
-                <div class="flow-particle" style="animation-delay: 0.8s; top: 150px;"></div>
-                <div class="flow-particle" style="animation-delay: 1.6s; top: 220px;"></div>
-                <div class="flow-particle" style="animation-delay: 2.4s; top: 290px;"></div>
-                <div class="flow-particle" style="animation-delay: 3.2s; top: 360px;"></div>
-            </div>
-            
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('query-flow')">Query Authorization</button>
-                <button class="tab" onclick="showTab('policy-sync')">Policy Synchronization</button>
-                <button class="tab" onclick="showTab('attribute-resolution')">Attribute Resolution</button>
-            </div>
-
-            <div id="query-flow" class="tab-content active">
-                <h3>Query Authorization Flow</h3>
-                
-                <!-- Visual Flow Diagram for Query -->
-                <div class="flow-visual">
-                    <div class="flow-container">
-                        <div class="flow-node">
-                            <div class="flow-node-icon">📊</div>
-                            <div class="flow-node-title">SQL Query</div>
-                            <div class="flow-node-desc">SELECT * FROM customers</div>
-                        </div>
-                        <div class="flow-node">
-                            <div class="flow-node-icon">🔍</div>
-                            <div class="flow-node-title">Parse Request</div>
-                            <div class="flow-node-desc">Extract user, table, action</div>
-                        </div>
-                        <div class="flow-node">
-                            <div class="flow-node-icon">⚖️</div>
-                            <div class="flow-node-title">Evaluate</div>
-                            <div class="flow-node-desc">Check policies & context</div>
-                        </div>
-                        <div class="flow-node">
-                            <div class="flow-node-icon">🎭</div>
-                            <div class="flow-node-title">Transform</div>
-                            <div class="flow-node-desc">Apply masks & filters</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="alert warning">
-                    <strong>Implementation Note:</strong> The following Snowflake SQL examples are illustrative. Actual implementation details may vary based on your PlainID configuration and Snowflake setup. Consult PlainID support for production implementations.
-                </div>
-
-                <div class="code">
--- Example: Snowflake External Function Pattern (Illustrative)
--- Actual syntax depends on your PlainID deployment
-CREATE OR REPLACE EXTERNAL FUNCTION plainid_authorize(
-    user_id VARCHAR,
-    resource VARCHAR,
-    action VARCHAR
-)
-RETURNS VARIANT
-API_INTEGRATION = plainid_integration
-AS 'https://your-paa-endpoint/api/v1/policy/resolution';</div>
-            </div>
-
-            <div id="policy-sync" class="tab-content">
-                <h3>Policy Synchronization</h3>
-                
-                <!-- Policy Sync Visual -->
-                <div class="flow-visual">
-                    <div class="flow-container">
-                        <div class="flow-node">
-                            <div class="flow-node-icon">📝</div>
-                            <div class="flow-node-title">Policy Update</div>
-                            <div class="flow-node-desc">Admin modifies policy in PAP</div>
-                        </div>
-                        <div class="flow-node">
-                            <div class="flow-node-icon">🔔</div>
-                            <div class="flow-node-title">Webhook Trigger</div>
-                            <div class="flow-node-desc">Notify PAA of changes</div>
-                        </div>
-                        <div class="flow-node">
-                            <div class="flow-node-icon">📡</div>
-                            <div class="flow-node-title">Redis Publish</div>
-                            <div class="flow-node-desc">Broadcast to all PDPs</div>
-                        </div>
-                        <div class="flow-node">
-                            <div class="flow-node-icon">🔄</div>
-                            <div class="flow-node-title">Cache Update</div>
-                            <div class="flow-node-desc">Invalidate & refresh cache</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="code">
-# Policy Sync Configuration
-sync:
-  method: webhook
-  endpoint: https://paa.example.com/policy/sync
-  authentication:
-    type: oauth2
-    clientId: ${CLIENT_ID}
-    clientSecret: ${CLIENT_SECRET}
-  notification:
-    redis:
-      channel: policy-updates
-      keyspace: notify-keyspace-events</div>
-            </div>
-
-            <div id="attribute-resolution" class="tab-content">
-                <h3>Attribute Resolution Process</h3>
-                
-                <!-- PIP Flow Visual -->
-                <div class="flow-visual">
-                    <div class="flow-container">
-                        <div class="flow-node">
-                            <div class="flow-node-icon">🔑</div>
-                            <div class="flow-node-title">Identity</div>
-                            <div class="flow-node-desc">User: john@company.com</div>
-                        </div>
-                        <div class="flow-node">
-                            <div class="flow-node-icon">🗂️</div>
-                            <div class="flow-node-title">LDAP Lookup</div>
-                            <div class="flow-node-desc">Dept: Finance, Level: 3</div>
-                        </div>
-                        <div class="flow-node">
-                            <div class="flow-node-icon">🏢</div>
-                            <div class="flow-node-title">HR System</div>
-                            <div class="flow-node-desc">Projects: [P1, P2, P3]</div>
-                        </div>
-                        <div class="flow-node">
-                            <div class="flow-node-icon">🎯</div>
-                            <div class="flow-node-title">Context Ready</div>
-                            <div class="flow-node-desc">Complete user profile</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <ul>
-                    <li><strong>Identity Attributes:</strong> User roles, departments, clearance levels</li>
-                    <li><strong>Resource Attributes:</strong> Data classification, ownership, sensitivity</li>
-                    <li><strong>Environmental Attributes:</strong> Time, location, network zone</li>
-                </ul>
-            </div>
-        </section>
-
-        <!-- PAA Setup -->
-        <section id="paa-setup">
-            <h2>PAA Setup</h2>
-            
-            <h3>Installation Methods</h3>
-            <div class="alert info">
-                PAA can be deployed using Helm charts (recommended) or standalone installation. Download the installation bundle from PlainID Platform.
-            </div>
-
-            <h3>Helm Deployment (Verified Configuration)</h3>
-            <div class="code">
-# Download PAA bundle from PlainID Platform
-# Extract the helm chart package
-tar -xzf plainid-paa-helm.tar.gz
-cd plainid-paa
-
-# Configure custom-values.yaml with your settings
-helm install snowflake-paa . \
-  --namespace plainid \
-  --create-namespace \
-  --values custom-values.yaml</div>
-
-            <h3>Required Environment Variables</h3>
-            <table>
-                <tr>
-                    <th>Variable</th>
-                    <th>Description</th>
-                    <th>Source</th>
-                </tr>
-                <tr>
-                    <td><span class="code-inline">tenantId</span></td>
-                    <td>PlainID tenant identifier</td>
-                    <td>Tenant Settings UI</td>
-                </tr>
-                <tr>
-                    <td><span class="code-inline">agentSecretKey</span></td>
-                    <td>PAA authentication key</td>
-                    <td>Hybrid Agent Keys tab</td>
-                </tr>
-                <tr>
-                    <td><span class="code-inline">paaId</span></td>
-                    <td>Policy Authorization Agent ID</td>
-                    <td>Policy Authorization Agents tab</td>
-                </tr>
-            </table>
-            
             <div class="alert warning">
-                <strong>Important:</strong> Redis is required for PAA operation. Use an external managed Redis instance for production environments.
+                <strong>Important:</strong> Unlike Data Authorizers that use PAA/PDP/PIP components, POPs operate as a SaaS service that orchestrates native vendor policies. For Snowflake, this means managing Snowflake's native row access policies and masking policies.
             </div>
         </section>
 
-        <!-- PIP Configuration -->
-        <section id="pip-config">
-            <h2>PIP Configuration</h2>
+        <!-- Snowflake POP -->
+        <section id="snowflake-pop">
+            <h2>Snowflake Policy Orchestration Point</h2>
             
-            <h3>Data Source Adapters</h3>
-            <p>Configure adapters for attribute resolution from Snowflake and other sources.</p>
+            <h3>Integration Overview</h3>
+            <p>The Snowflake POP enables PlainID to discover, manage, and deploy authorization policies using Snowflake's native security features.</p>
 
+            <h3>Discovered Objects</h3>
             <div class="code">
-// Snowflake JDBC Adapter
+# Objects automatically discovered during POP initialization:
+
+DATABASES
+├── Schemas
+├── Tables
+│   ├── Columns (with data types)
+│   └── Row Access Policies
+├── Views
+│   ├── Columns
+│   └── Access Policies
+└── Warehouses
+
+SECURITY OBJECTS
+├── Roles (System & Custom)
+├── Users
+├── Masking Policies
+├── Row Access Policies
+└── Network Policies
+
+METADATA
+├── Tags
+├── Classifications
+└── Data Lineage</div>
+
+            <h3>Policy Translation</h3>
+            <p>PlainID policies are automatically translated to Snowflake native constructs:</p>
+            
+            <table>
+                <tr>
+                    <th>PlainID Policy Type</th>
+                    <th>Snowflake Implementation</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td>Row-Level Security</td>
+                    <td>ROW ACCESS POLICY</td>
+                    <td><span class="code-inline">region = current_user_region()</span></td>
+                </tr>
+                <tr>
+                    <td>Column Masking</td>
+                    <td>MASKING POLICY</td>
+                    <td><span class="code-inline">CASE WHEN role IN ('ANALYST') THEN val ELSE '***' END</span></td>
+                </tr>
+                <tr>
+                    <td>Dynamic Groups</td>
+                    <td>Role Hierarchies + Policies</td>
+                    <td>Mapped to Snowflake role structures</td>
+                </tr>
+                <tr>
+                    <td>Attribute-Based Access</td>
+                    <td>Context Functions + Policies</td>
+                    <td><span class="code-inline">current_role(), current_user()</span></td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Learn & Manage Modes -->
+        <section id="modes">
+            <h2>Learn & Manage Modes</h2>
+            
+            <div class="mode-toggle">
+                <button class="active" onclick="showMode('learn')">Learn Mode</button>
+                <button onclick="showMode('manage')">Manage Mode</button>
+            </div>
+
+            <div id="learn-mode" class="mode-content">
+                <h3>Learn Mode (Discovery)</h3>
+                <p>Initial integration phase where PlainID discovers and maps existing Snowflake policies without making changes.</p>
+                
+                <div class="alert info">
+                    <strong>Purpose:</strong> Provides full visibility into existing policies and access patterns before enabling management capabilities.
+                </div>
+
+                <h4>Learn Mode Activities:</h4>
+                <ul>
+                    <li>Discovers all Snowflake databases, schemas, tables, and views</li>
+                    <li>Maps existing row access policies and masking policies</li>
+                    <li>Identifies role hierarchies and user assignments</li>
+                    <li>Translates Snowflake policies to PlainID policy representation</li>
+                    <li>Generates Policy Map visualization</li>
+                    <li>Creates audit reports of current access patterns</li>
+                </ul>
+
+                <div class="code">
+// Example: Discovered Snowflake Policy
+CREATE ROW ACCESS POLICY sales_region_policy
+AS (region_column VARCHAR) 
+RETURNS BOOLEAN ->
+  EXISTS (
+    SELECT 1 FROM sales_managers 
+    WHERE manager_id = CURRENT_USER() 
+    AND region = region_column
+  );
+
+// Translated to PlainID Policy Structure
 {
-  "adapter": {
-    "name": "snowflake-prod",
-    "type": "JDBC",
-    "configuration": {
-      "driver": "net.snowflake.client.jdbc.SnowflakeDriver",
-      "url": "jdbc:snowflake://${ACCOUNT}.snowflakecomputing.com",
-      "warehouse": "COMPUTE_WH",
-      "database": "USER_DATA",
-      "schema": "ATTRIBUTES",
-      "authentication": {
-        "type": "oauth",
-        "tokenEndpoint": "${TOKEN_ENDPOINT}"
-      }
+  "policyName": "sales_region_policy",
+  "type": "row_filter",
+  "condition": {
+    "type": "exists",
+    "source": "sales_managers",
+    "match": {
+      "manager_id": "${user.id}",
+      "region": "${row.region_column}"
     }
   }
 }</div>
+            </div>
 
-            <h3>View Definitions</h3>
+            <div id="manage-mode" class="mode-content" style="display: none;">
+                <h3>Manage Mode (Active Orchestration)</h3>
+                <p>Full policy management where PlainID becomes the authoritative source for Snowflake policies.</p>
+                
+                <div class="alert success">
+                    <strong>Capability:</strong> Create, update, and delete policies in PlainID that are automatically deployed to Snowflake.
+                </div>
+
+                <h4>Manage Mode Features:</h4>
+                <ul>
+                    <li>Create new policies in PlainID's visual interface</li>
+                    <li>Deploy policies to Snowflake automatically</li>
+                    <li>Update existing Snowflake policies through PlainID</li>
+                    <li>Synchronize policy changes across environments</li>
+                    <li>Enforce approval workflows before deployment</li>
+                    <li>Rollback policy changes if needed</li>
+                </ul>
+
+                <h4>Policy Deployment Example:</h4>
+                <div class="code">
+# PlainID Policy (Visual Editor)
+Policy: "PII Data Protection"
+Target: CUSTOMER_DATA.PERSONAL_INFO
+Rules:
+  - If user.department != 'HR' 
+    Then mask(ssn, credit_card)
+  - If user.clearance_level < 3
+    Then deny_access()
+
+# Auto-deployed to Snowflake as:
+CREATE OR REPLACE MASKING POLICY pii_protection_mask
+AS (val STRING) 
+RETURNS STRING ->
+  CASE 
+    WHEN CURRENT_ROLE() IN (SELECT role FROM hr_roles) 
+    THEN val
+    ELSE '***-**-****'
+  END;
+
+ALTER TABLE customer_data.personal_info 
+MODIFY COLUMN ssn SET MASKING POLICY pii_protection_mask;</div>
+            </div>
+        </section>
+
+        <!-- POP Setup -->
+        <section id="pop-setup">
+            <h2>Snowflake POP Setup</h2>
+            
+            <h3>Prerequisites</h3>
+            <ul>
+                <li>Snowflake Account with ACCOUNTADMIN or SECURITYADMIN privileges</li>
+                <li>Service Account for PlainID integration</li>
+                <li>PlainID Platform access with Orchestration Workspace enabled</li>
+            </ul>
+
+            <h3>Step 1: Create Snowflake Service Account</h3>
             <div class="code">
-// User Attributes View
-CREATE VIEW user_enrichment AS
-SELECT 
-    u.user_id,
-    u.email,
-    d.department_name,
-    d.cost_center,
-    r.role_name,
-    r.permissions
-FROM users u
-JOIN departments d ON u.dept_id = d.id
-JOIN roles r ON u.role_id = r.id
-WHERE u.active = true;</div>
+-- Create PlainID integration role
+CREATE ROLE PLAINID_ORCHESTRATOR;
 
-            <h3>Caching Configuration</h3>
+-- Grant necessary privileges
+GRANT USAGE ON WAREHOUSE COMPUTE_WH TO ROLE PLAINID_ORCHESTRATOR;
+GRANT USAGE ON ALL DATABASES IN ACCOUNT TO ROLE PLAINID_ORCHESTRATOR;
+GRANT USAGE ON ALL SCHEMAS IN DATABASE TO ROLE PLAINID_ORCHESTRATOR;
+GRANT SELECT ON ALL TABLES IN SCHEMA TO ROLE PLAINID_ORCHESTRATOR;
+GRANT SELECT ON ALL VIEWS IN SCHEMA TO ROLE PLAINID_ORCHESTRATOR;
+
+-- Grant policy management privileges
+GRANT CREATE ROW ACCESS POLICY ON SCHEMA * TO ROLE PLAINID_ORCHESTRATOR;
+GRANT CREATE MASKING POLICY ON SCHEMA * TO ROLE PLAINID_ORCHESTRATOR;
+GRANT APPLY ROW ACCESS POLICY ON ACCOUNT TO ROLE PLAINID_ORCHESTRATOR;
+GRANT APPLY MASKING POLICY ON ACCOUNT TO ROLE PLAINID_ORCHESTRATOR;
+
+-- Create service user
+CREATE USER PLAINID_SERVICE_USER
+  PASSWORD = 'secure_password'
+  DEFAULT_ROLE = PLAINID_ORCHESTRATOR;
+
+GRANT ROLE PLAINID_ORCHESTRATOR TO USER PLAINID_SERVICE_USER;</div>
+
+            <h3>Step 2: Configure POP in PlainID</h3>
+            <ol>
+                <li>Navigate to <strong>Orchestration Workspace</strong></li>
+                <li>Click <strong>Add Policy Orchestration Point</strong></li>
+                <li>Select <strong>Snowflake</strong> from vendor list</li>
+                <li>Configure connection settings:</li>
+            </ol>
+
+            <div class="code">
+{
+  "displayName": "Snowflake Production POP",
+  "connectionSettings": {
+    "account": "mycompany.snowflakecomputing.com",
+    "warehouse": "COMPUTE_WH",
+    "database": "PRODUCTION",
+    "authenticationType": "password",
+    "username": "PLAINID_SERVICE_USER",
+    "password": "${ENCRYPTED_PASSWORD}"
+  },
+  "discoveryScope": {
+    "databases": ["PRODUCTION", "ANALYTICS"],
+    "schemas": ["PUBLIC", "SENSITIVE", "REPORTS"],
+    "includeMaskingPolicies": true,
+    "includeRowAccessPolicies": true,
+    "includeRoles": true
+  },
+  "syncSettings": {
+    "mode": "learn",  // Start with learn mode
+    "syncInterval": "hourly",
+    "conflictResolution": "plainid_wins"
+  }
+}</div>
+
+            <h3>Step 3: Test Connection</h3>
+            <div class="alert info">
+                Click <strong>Test Connection</strong> to verify PlainID can connect to your Snowflake account and has appropriate permissions.
+            </div>
+        </section>
+
+        <!-- Discovery Process -->
+        <section id="discovery">
+            <h2>Discovery Process</h2>
+            
+            <h3>Automatic Discovery Flow</h3>
+            <p>When a Snowflake POP is created, PlainID automatically initiates a discovery process:</p>
+
+            <div class="architecture">
+                <div class="flow">
+                    <div class="component">
+                        <strong>1. Scan</strong><br>
+                        Query Snowflake<br>metadata
+                    </div>
+                    <span class="arrow">→</span>
+                    <div class="component">
+                        <strong>2. Map</strong><br>
+                        Create PlainID<br>objects
+                    </div>
+                    <span class="arrow">→</span>
+                    <div class="component">
+                        <strong>3. Translate</strong><br>
+                        Convert policies to<br>PBAC format
+                    </div>
+                    <span class="arrow">→</span>
+                    <div class="component">
+                        <strong>4. Display</strong><br>
+                        Show in Orchestration<br>Workspace
+                    </div>
+                </div>
+            </div>
+
+            <h3>Discovered Elements Mapping</h3>
             <table>
                 <tr>
-                    <th>Cache Type</th>
-                    <th>Use Case</th>
-                    <th>TTL</th>
+                    <th>Snowflake Object</th>
+                    <th>PlainID Mapping</th>
+                    <th>Workspace</th>
                 </tr>
                 <tr>
-                    <td>Persistent</td>
-                    <td>Static reference data</td>
-                    <td>3600s</td>
+                    <td>Database.Schema.Table</td>
+                    <td>Asset Type</td>
+                    <td>Authorization Workspace</td>
                 </tr>
                 <tr>
-                    <td>In-Memory</td>
-                    <td>Frequently accessed attributes</td>
-                    <td>300s</td>
+                    <td>Columns</td>
+                    <td>Asset Attributes</td>
+                    <td>Authorization Workspace</td>
                 </tr>
                 <tr>
-                    <td>No Cache</td>
-                    <td>Real-time sensitive data</td>
-                    <td>0s</td>
+                    <td>Roles</td>
+                    <td>Dynamic Groups</td>
+                    <td>Identity Workspace</td>
+                </tr>
+                <tr>
+                    <td>Users</td>
+                    <td>Identities</td>
+                    <td>Identity Workspace</td>
+                </tr>
+                <tr>
+                    <td>Row Access Policies</td>
+                    <td>Filter Policies</td>
+                    <td>Orchestration Workspace</td>
+                </tr>
+                <tr>
+                    <td>Masking Policies</td>
+                    <td>Masking Policies</td>
+                    <td>Orchestration Workspace</td>
                 </tr>
             </table>
+
+            <h3>Manual Discovery Trigger</h3>
+            <div class="code">
+# Trigger discovery manually from Orchestration Workspace
+1. Navigate to Snowflake POP card
+2. Click three dots menu (⋮)
+3. Select "Discover Now"
+4. Monitor progress in Activity Log
+
+# Discovery API endpoint (for automation)
+POST /api/v1/orchestration/pop/{popId}/discover
+{
+  "scope": "full",  // or "incremental"
+  "notify": true
+}</div>
         </section>
 
         <!-- Policy Resolution -->
         <section id="policy-resolution">
             <h2>Policy Resolution Pattern</h2>
             
-            <div class="alert info">
-                <strong>Note:</strong> Policy Resolution is PlainID's documented pattern for data authorization. This endpoint is specifically designed for data use cases including Snowflake integration.
-            </div>
-            
-            <h3>Request Structure</h3>
+            <h3>How POP Uses Policy Resolution</h3>
+            <p>While POPs primarily manage native vendor policies, they utilize PlainID's Policy Resolution API for complex data access scenarios.</p>
+
             <div class="endpoint">
                 <span class="method post">POST</span>
                 <span class="code-inline">/api/v1/policy/resolution</span>
             </div>
 
+            <h3>Resolution Request (Snowflake Context)</h3>
             <div class="code">
 {
   "identity": {
     "type": "user",
-    "id": "john.doe@example.com"
+    "id": "snowflake_user@company.com",
+    "attributes": {
+      "department": "Finance",
+      "clearance_level": 2,
+      "region": "US_EAST"
+    }
   },
   "scope": {
-    "name": "snowflake-prod"
+    "name": "snowflake-production"
   },
   "assetType": {
     "type": "table",
     "database": "ANALYTICS",
-    "schema": "SALES"
+    "schema": "SALES",
+    "table": "REVENUE_DATA"
   },
   "action": "SELECT",
   "context": {
-    "ip": "10.0.1.50",
-    "time": "2024-01-15T10:30:00Z"
+    "warehouse": "COMPUTE_WH",
+    "role": "ANALYST",
+    "session_id": "sf_session_12345"
   }
 }</div>
 
-            <h3>Response Structure</h3>
+            <h3>Resolution Response</h3>
             <div class="code">
 {
   "decision": "PERMIT",
-  "access": {
-    "columns": ["customer_id", "order_date", "amount"],
-    "denied": ["ssn", "credit_card"]
-  },
-  "privileges": {
-    "filters": [
-      {
-        "column": "region",
-        "operator": "IN",
-        "values": ["US_EAST", "US_WEST"]
-      }
-    ],
-    "masks": [
-      {
-        "column": "email",
-        "function": "partial_mask",
-        "params": {"show_last": 4}
-      }
-    ]
-  }
-}</div>
-
-            <h3>Policy Definition</h3>
-            <div class="code">
-{
-  "policy": {
-    "name": "snowflake-data-governance",
-    "rules": [
-      {
-        "id": "pii-protection",
-        "effect": "MASK",
-        "target": {
-          "resource": "column:*/pii/*",
-          "subjects": ["role:analyst"]
-        },
-        "condition": "user.clearance_level < 3",
-        "action": {
-          "type": "mask",
-          "function": "hash"
-        }
-      }
-    ]
-  }
-}</div>
-            
-            <div class="alert success">
-                <strong>Best Practice:</strong> Policy Resolution is recommended for data use cases where the expected number of assets returned per call is more than 1000. This pattern supports row-level and column-level filtering.
-            </div>
-        </section>
-
-        <!-- Data Masking -->
-        <section id="data-masking">
-            <h2>Data Masking Configuration</h2>
-            
-            <h3>PlainID Masking Functions (Documented)</h3>
-            <table>
-                <tr>
-                    <th>Function</th>
-                    <th>Description</th>
-                    <th>Example Output</th>
-                </tr>
-                <tr>
-                    <td><span class="code-inline">partial_mask</span></td>
-                    <td>Shows only part of the value</td>
-                    <td>john****@example.com</td>
-                </tr>
-                <tr>
-                    <td><span class="code-inline">hash</span></td>
-                    <td>One-way hash function</td>
-                    <td>a1b2c3d4...</td>
-                </tr>
-                <tr>
-                    <td><span class="code-inline">tokenize</span></td>
-                    <td>Reversible tokenization</td>
-                    <td>TKN_12345</td>
-                </tr>
-                <tr>
-                    <td><span class="code-inline">redact</span></td>
-                    <td>Complete removal</td>
-                    <td>[REDACTED]</td>
-                </tr>
-                <tr>
-                    <td><span class="code-inline">k-anonymization</span></td>
-                    <td>Statistical privacy protection</td>
-                    <td>Generalized value</td>
-                </tr>
-            </table>
-
-            <h3>Integration Pattern</h3>
-            <p>PlainID's Policy Resolution endpoint returns masking instructions that should be applied to query results. The enforcement happens through the Data Authorizer pattern.</p>
-            
-            <div class="alert info">
-                <strong>How it Works:</strong> PlainID evaluates policies and returns masking functions in the Policy Resolution response. Your integration layer applies these masks to the data before returning results to users.
-            </div>
-
-            <div class="code">
-// Example Policy Resolution Response with Masking
-{
-  "privileges": {
-    "masks": [
-      {
-        "column": "email",
-        "function": "partial_mask",
-        "params": {"show_last": 4}
-      },
+  "nativePolicies": {
+    "rowAccessPolicy": {
+      "name": "finance_region_policy",
+      "sql": "region IN ('US_EAST', 'US_CENTRAL')"
+    },
+    "maskingPolicies": [
       {
         "column": "ssn",
-        "function": "redact"
-      }
-    ]
-  }
-}</div>
-        </section>
-
-        <!-- Row Filtering -->
-        <section id="row-filtering">
-            <h2>Row-Level Security</h2>
-            
-            <h3>PlainID Row Filtering Pattern</h3>
-            <p>PlainID provides row-level filtering through the Policy Resolution endpoint. The response includes filter conditions that should be applied to queries.</p>
-            
-            <div class="code">
-// Policy Resolution Response with Row Filters
-{
-  "privileges": {
-    "filters": [
-      {
-        "column": "region",
-        "operator": "IN",
-        "values": ["US_EAST", "US_WEST"]
+        "policy": "pii_mask_policy",
+        "function": "REGEXP_REPLACE(val, '[0-9]', 'X')"
       },
       {
-        "column": "department",
-        "operator": "=",
-        "value": "Finance"
+        "column": "salary",
+        "policy": "salary_mask_policy", 
+        "function": "CASE WHEN current_role() = 'HR' THEN val ELSE 0 END"
       }
+    ]
+  },
+  "deploymentInstructions": {
+    "applyRowPolicy": "ALTER TABLE analytics.sales.revenue_data ADD ROW ACCESS POLICY finance_region_policy ON (region)",
+    "applyMaskingPolicies": [
+      "ALTER TABLE analytics.sales.revenue_data MODIFY COLUMN ssn SET MASKING POLICY pii_mask_policy",
+      "ALTER TABLE analytics.sales.revenue_data MODIFY COLUMN salary SET MASKING POLICY salary_mask_policy"
     ]
   }
 }</div>
+        </section>
 
-            <h3>Implementation Approach</h3>
-            <div class="alert info">
-                <strong>Data Authorizer Pattern:</strong> PlainID's Data Authorizers use the Policy Resolution endpoint to determine which rows a user can access. The filters are then applied at the query level, either through middleware or native database features.
-            </div>
+        <!-- Orchestration Workspace -->
+        <section id="orchestration-workspace">
+            <h2>Orchestration Workspace</h2>
             
+            <h3>Workspace Overview</h3>
+            <p>The Orchestration Workspace provides centralized visibility and management for all Snowflake policies.</p>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('vendor-policies')">Vendor Policies</button>
+                <button class="tab" onclick="showTab('objects')">Objects</button>
+                <button class="tab" onclick="showTab('policy-map')">Policy Map</button>
+                <button class="tab" onclick="showTab('reconciliation')">Reconciliation</button>
+            </div>
+
+            <div id="vendor-policies" class="tab-content active">
+                <h4>Vendor Policies Tab</h4>
+                <p>Lists all discovered and managed Snowflake policies:</p>
+                <ul>
+                    <li>Native Snowflake row access policies</li>
+                    <li>Masking policies with their conditions</li>
+                    <li>Policy creation/modification timestamps</li>
+                    <li>Deployment status (synced/pending/conflict)</li>
+                </ul>
+            </div>
+
+            <div id="objects" class="tab-content">
+                <h4>Objects Tab</h4>
+                <p>Displays discovered Snowflake objects:</p>
+                <ul>
+                    <li>Databases and schemas hierarchy</li>
+                    <li>Tables and views with column details</li>
+                    <li>Warehouses and their configurations</li>
+                    <li>Object relationships and dependencies</li>
+                </ul>
+            </div>
+
+            <div id="policy-map" class="tab-content">
+                <h4>Policy Map Visualization</h4>
+                <p>Graphical representation showing:</p>
+                <ul>
+                    <li>Identity-to-resource access paths</li>
+                    <li>Policy application flow</li>
+                    <li>Effective permissions visualization</li>
+                    <li>Access pattern analysis</li>
+                </ul>
+            </div>
+
+            <div id="reconciliation" class="tab-content">
+                <h4>Policy Reconciliation</h4>
+                <p>Side-by-side comparison of:</p>
+                <ul>
+                    <li>PlainID policies vs Snowflake native policies</li>
+                    <li>Pending changes awaiting deployment</li>
+                    <li>Conflict detection and resolution</li>
+                    <li>Drift analysis between environments</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Monitoring -->
+        <section id="monitoring">
+            <h2>Monitoring & Auditing</h2>
+            
+            <h3>POP Activity Monitoring</h3>
+            <div class="code">
+# Activity Log Entry Example
+{
+  "timestamp": "2024-12-15T10:30:00Z",
+  "popId": "snowflake-prod-pop",
+  "action": "POLICY_DEPLOYED",
+  "details": {
+    "policyName": "revenue_access_policy",
+    "targetObject": "ANALYTICS.SALES.REVENUE",
+    "deploymentStatus": "SUCCESS",
+    "changedBy": "admin@company.com",
+    "approvedBy": "security_team",
+    "snowflakeResponse": {
+      "status": "APPLIED",
+      "affectedRows": 1500000
+    }
+  }
+}</div>
+
+            <h3>Audit Capabilities</h3>
             <ul>
-                <li><strong>Column-Level Access:</strong> Controls which columns are returned in the query</li>
-                <li><strong>Row-Level Filtering:</strong> Adds WHERE clause conditions based on policies</li>
-                <li><strong>Cell-Level Security:</strong> Combines row filters with column masking</li>
+                <li><strong>Policy Changes:</strong> Complete history of all policy modifications</li>
+                <li><strong>Discovery Events:</strong> Log of all discovery runs and findings</li>
+                <li><strong>Deployment History:</strong> Record of all policy deployments to Snowflake</li>
+                <li><strong>Access Patterns:</strong> Analysis of who accessed what data when</li>
+                <li><strong>Compliance Reports:</strong> Automated compliance reporting for auditors</li>
             </ul>
-
-            <div class="alert warning">
-                <strong>Performance Consideration:</strong> Complex row filters may impact query performance. PlainID recommends using caching strategies and optimizing PDP response times. Cache duration is configurable per scope.
-            </div>
         </section>
 
-        <!-- Helm Deployment -->
-        <section id="helm">
-            <h2>Helm Deployment (Verified Configuration)</h2>
+        <!-- Troubleshooting -->
+        <section id="troubleshooting">
+            <h2>Troubleshooting</h2>
             
-            <h3>Custom Values Configuration</h3>
-            <div class="code">
-# custom-values.yaml
-# Values obtained from PlainID Platform UI
-global:
-  tenantId: "your-tenant-id"  # From Tenant Settings
-  agentSecretKey: "your-secret-key"  # From Hybrid Agent Keys tab
-  paaId: "your-paa-id"  # From Policy Authorization Agents tab
-
-pdp:
-  replicas: 3
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "500m"
-    limits:
-      memory: "1Gi"
-      cpu: "1000m"
-
-# External Redis recommended for production
-redis:
-  enabled: false  # Disable if using external Redis
-  external:
-    host: "your-redis-endpoint"
-    port: 6379
-
-pip:
-  enabled: true
-  dataSources:
-    - name: snowflake
-      type: jdbc
-      adapter: "net.snowflake.client.jdbc.SnowflakeDriver"
-
-# OAuth configuration for PIP data sources
-pipOperator:
-  plainIDConfig:
-    auth-config.xml: |
-      <?xml version='1.0'?>
-      <policy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:schemaLocation="urn:jboss:security-config:5.0"
-              xmlns="urn:jboss:security-config:5.0">
-        <!-- OAuth configuration for data sources -->
-      </policy></div>
-
-            <h3>Deployment Commands</h3>
-            <div class="code">
-# Create namespace
-kubectl create namespace plainid
-
-# Install PAA with custom values
-helm install snowflake-paa ./plainid-paa \
-  --namespace plainid \
-  --values custom-values.yaml \
-  --wait
-
-# Verify deployment
-kubectl get pods -n plainid
-kubectl logs -f deployment/snowflake-paa-pdp -n plainid</div>
+            <h3>Common Issues and Resolutions</h3>
             
-            <div class="alert success">
-                <strong>Note:</strong> Redis cluster mode is not currently supported. Use standalone or HA Redis configurations.
-            </div>
-        </section>
-
-        <!-- Caching Strategy -->
-        <section id="caching">
-            <h2>Caching Strategy (Documented Configuration)</h2>
-            
-            <h3>Cache Layers</h3>
-            <div class="architecture">
-                <div class="flow">
-                    <div class="component">
-                        <strong>Identity Cache</strong><br>
-                        Duration in seconds<br>
-                        <small>User attributes</small>
-                    </div>
-                    <span class="arrow">→</span>
-                    <div class="component primary">
-                        <strong>Scope Cache</strong><br>
-                        Duration in minutes<br>
-                        <small>Access decisions</small>
-                    </div>
-                    <span class="arrow">→</span>
-                    <div class="component">
-                        <strong>PIP Cache</strong><br>
-                        Persistent/In-Memory<br>
-                        <small>External data</small>
-                    </div>
-                </div>
-            </div>
-
-            <h3>Cache Configuration</h3>
-            <div class="code">
-# Identity Cache (configured in seconds)
-# Path: Identity Workspace Settings > Attribute sources > Cache Duration
-identity.cache.duration=1800  # 30 minutes
-
-# Scope Cache (configured in minutes)  
-# Path: Environment Settings > Scopes > Cache Duration
-scope.cache.duration=5  # 5 minutes
-
-# PIP Cache Options
-pip.cache.type=persistent  # or in-memory
-pip.cache.refreshInterval=3600  # 1 hour
-
-# Redis Configuration (required)
-redis.notify-keyspace-events=true  # For PAA sync</div>
-
-            <h3>Cache Types</h3>
             <table>
                 <tr>
-                    <th>Cache Type</th>
-                    <th>Use Case</th>
-                    <th>Configuration</th>
+                    <th>Issue</th>
+                    <th>Symptoms</th>
+                    <th>Resolution</th>
                 </tr>
                 <tr>
-                    <td>Persistent Cache</td>
-                    <td>Static reference data</td>
-                    <td>Stored in database, survives restarts</td>
+                    <td>Discovery Incomplete</td>
+                    <td>Some Snowflake objects not appearing in PlainID</td>
+                    <td>Check service account permissions; ensure USAGE grants on all schemas</td>
                 </tr>
                 <tr>
-                    <td>In-Memory Cache</td>
-                    <td>Frequently accessed attributes</td>
-                    <td>Fast access, cleared on restart</td>
+                    <td>Policy Deployment Fails</td>
+                    <td>Policies created in PlainID not applying to Snowflake</td>
+                    <td>Verify APPLY POLICY privileges; check for conflicting native policies</td>
                 </tr>
                 <tr>
-                    <td>No Cache</td>
-                    <td>Real-time sensitive data</td>
-                    <td>Cache duration = 0</td>
+                    <td>Sync Conflicts</td>
+                    <td>Discrepancies between PlainID and Snowflake policies</td>
+                    <td>Use Reconciliation view; set conflict resolution strategy</td>
+                </tr>
+                <tr>
+                    <td>Performance Issues</td>
+                    <td>Slow discovery or deployment</td>
+                    <td>Optimize discovery scope; use incremental discovery mode</td>
+                </tr>
+                <tr>
+                    <td>Connection Timeouts</td>
+                    <td>Test connection fails</td>
+                    <td>Check network policies; verify warehouse is running</td>
                 </tr>
             </table>
 
-            <div class="alert success">
-                <strong>Best Practice:</strong> Use identity caching when attributes like job title, department, location don't change frequently. Set cache duration based on data volatility.
-            </div>
-        </section>
-
-        <!-- API Reference -->
-        <section id="permit-deny">
-            <h2>Permit/Deny API</h2>
-            
-            <div class="endpoint">
-                <span class="method post">POST</span>
-                <span class="code-inline">/api/v1/authorize/permit-deny</span>
-            </div>
-
-            <h3>Request</h3>
+            <h3>Debug Mode</h3>
             <div class="code">
-curl -X POST https://paa.example.com/api/v1/authorize/permit-deny \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -d '{
-    "subject": "user:john.doe",
-    "resource": "snowflake:db:analytics:table:sales",
-    "action": "SELECT",
-    "context": {
-      "ip": "10.0.1.50",
-      "mfa": true
-    }
-  }'</div>
-
-            <h3>Response</h3>
-            <div class="code">
+# Enable debug logging for POP
 {
-  "decision": "PERMIT",
-  "obligations": [
-    {
-      "type": "mask",
-      "columns": ["ssn", "credit_card"]
+  "popId": "snowflake-prod-pop",
+  "settings": {
+    "logging": {
+      "level": "DEBUG",
+      "includeSnowflakeQueries": true,
+      "logPolicyTranslations": true,
+      "capturePerformanceMetrics": true
     }
-  ],
-  "ttl": 300
+  }
 }</div>
         </section>
 
-        <div class="alert info" style="margin-top: 3rem;">
-            <strong>Documentation Based On:</strong> PlainID Official Documentation (docs.plainid.io)<br>
-            <strong>Last Updated:</strong> January 2025<br>
-            <strong>Note:</strong> Specific Snowflake implementation details may vary. For production deployments, contact PlainID Technical Support.
+        <div class="alert success" style="margin-top: 3rem;">
+            <strong>Best Practice:</strong> Start with Learn Mode to understand your existing Snowflake policies before enabling Manage Mode. This ensures a smooth transition to centralized policy management without disrupting existing access patterns.
         </div>
-        
-        <div style="text-align: center; margin-top: 4rem; padding: 2rem 0; border-top: 1px solid var(--border); color: var(--text); opacity: 0.5; font-size: 0.75rem;">
-            Made by the SE Team • For Walkthrough Purposes Only
+
+        <div class="alert info" style="margin-top: 2rem;">
+            <strong>Documentation Based On:</strong> PlainID Platform Documentation & Snowflake Integration Announcement (December 2024)<br>
+            <strong>Pattern:</strong> Policy Orchestration Point (POP) for SaaS Authorization Management<br>
+            <strong>Support:</strong> For production deployments, contact PlainID Technical Support for detailed implementation guidance.
         </div>
     </main>
 
     <script>
-        // Dark Mode Toggle
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        }
-
-        // Load saved theme preference on page load
-        (function() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        })();
-
         // Tab functionality
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(content => {
@@ -1666,6 +1367,19 @@ curl -X POST https://paa.example.com/api/v1/authorize/permit-deny \
             
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Mode toggle
+        function showMode(mode) {
+            document.querySelectorAll('.mode-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById(mode + '-mode').style.display = 'block';
+            
+            document.querySelectorAll('.mode-toggle button').forEach(btn => {
+                btn.classList.remove('active');
             });
             event.target.classList.add('active');
         }
@@ -1725,18 +1439,6 @@ curl -X POST https://paa.example.com/api/v1/authorize/permit-deny \
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
-            });
-        });
-
-        // Add hover effects to sequence diagram messages
-        document.querySelectorAll('.message').forEach(msg => {
-            msg.addEventListener('mouseenter', function() {
-                this.style.zIndex = '10';
-                this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-            });
-            msg.addEventListener('mouseleave', function() {
-                this.style.zIndex = '1';
-                this.style.boxShadow = 'none';
             });
         });
     </script>

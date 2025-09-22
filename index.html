@@ -37,6 +37,32 @@
             background: var(--main-bg);
         }
 
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 4px 0;
+            background: rgba(248, 250, 252, 0.95);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+            z-index: 9999;
+            font-size: 11px;
+            color: rgba(100, 116, 139, 0.7);
+            font-style: italic;
+        }
+
+        .watermark a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .watermark a:hover {
+            color: var(--primary);
+        }
+
         /* Sidebar */
         .sidebar {
             width: 280px;
@@ -44,6 +70,7 @@
             border-right: 1px solid var(--border);
             overflow-y: auto;
             padding: 2rem 1rem;
+            margin-top: 28px; /* Account for watermark */
         }
 
         .sidebar h3 {
@@ -85,6 +112,7 @@
             overflow-y: auto;
             padding: 2rem 3rem;
             max-width: 1000px;
+            margin-top: 28px; /* Account for watermark */
         }
 
         h1 {
@@ -113,16 +141,23 @@
             line-height: 1.7;
         }
 
-        /* Code Block */
+        /* Code Block - Updated for better formatting */
         .code {
             background: var(--code-bg);
             color: #e2e8f0;
             padding: 1rem;
             border-radius: 6px;
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 0.875rem;
-            overflow-x: auto;
             margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code pre {
+            margin: 0;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre;
+            color: #e2e8f0;
         }
 
         .code-inline {
@@ -557,6 +592,13 @@
     </style>
 </head>
 <body>
+    <!-- Watermark -->
+    <div class="watermark">
+        <a href="https://docs.plainid.io" target="_blank" rel="noopener noreferrer">
+            Made by the SE Team For Walkthrough Purposes Only
+        </a>
+    </div>
+
     <!-- Sidebar Navigation -->
     <nav class="sidebar">
         <h3>Policy Orchestration</h3>
@@ -600,7 +642,8 @@
         </div>
         
         <div class="alert info">
-            <strong>Version:</strong> PlainID Platform 2024.1+ | <strong>Feature:</strong> Snowflake Policy Orchestration Point | <strong>Announced:</strong> December 2024
+            <strong>Version:</strong> PlainID Platform 2024.1+ | <strong>Feature:</strong> Snowflake Policy Orchestration Point | <strong>Announced:</strong> December 2024<br>
+            <strong>Snowflake Requirements:</strong> Enterprise Edition or higher (required for Row Access Policies and Dynamic Data Masking)
         </div>
 
         <!-- System Overview -->
@@ -736,11 +779,12 @@
 
             <h3>Key Capabilities</h3>
             <ul>
-                <li><strong>Policy Discovery:</strong> Automatic discovery of existing Snowflake row access policies, masking policies, and role structures</li>
+                <li><strong>Policy Discovery:</strong> Automatic discovery of existing Snowflake row access policies, masking policies, tag-based policies, and role structures</li>
                 <li><strong>Centralized Management:</strong> Single pane of glass for managing data access across multiple Snowflake accounts and warehouses</li>
                 <li><strong>Bi-directional Sync:</strong> Policies created in PlainID are deployed and enforced in Snowflake</li>
                 <li><strong>Visual Policy Mapping:</strong> Graphical representation of complex access policies</li>
                 <li><strong>Audit & Compliance:</strong> Complete visibility and audit trail of all policy changes</li>
+                <li><strong>Tag-Based Governance:</strong> Support for Snowflake's tag-based security policies for metadata-driven access control</li>
             </ul>
         </section>
 
@@ -814,7 +858,7 @@
 
             <h3>Discovered Objects</h3>
             <div class="code">
-# Objects automatically discovered during POP initialization:
+<pre># Objects automatically discovered during POP initialization:
 
 DATABASES
 ├── Schemas
@@ -824,19 +868,25 @@ DATABASES
 ├── Views
 │   ├── Columns
 │   └── Access Policies
+├── External Functions
 └── Warehouses
 
 SECURITY OBJECTS
 ├── Roles (System & Custom)
 ├── Users
 ├── Masking Policies
+│   ├── Standard Masking Policies
+│   └── Tag-Based Masking Policies
 ├── Row Access Policies
-└── Network Policies
+├── Network Policies
+└── Tags (for Tag-Based Security)
 
 METADATA
 ├── Tags
 ├── Classifications
-└── Data Lineage</div>
+├── Policy Associations
+└── Data Lineage</pre>
+            </div>
 
             <h3>Policy Translation</h3>
             <p>PlainID policies are automatically translated to Snowflake native constructs:</p>
@@ -860,14 +910,50 @@ METADATA
                 <tr>
                     <td>Dynamic Groups</td>
                     <td>Role Hierarchies + Policies</td>
-                    <td>Mapped to Snowflake role structures</td>
+                    <td>Mapped to Snowflake role structures with IS_ROLE_IN_SESSION()</td>
                 </tr>
                 <tr>
                     <td>Attribute-Based Access</td>
                     <td>Context Functions + Policies</td>
-                    <td><span class="code-inline">current_role(), current_user()</span></td>
+                    <td><span class="code-inline">current_role(), current_user(), current_account()</span></td>
+                </tr>
+                <tr>
+                    <td>Tag-Based Policies</td>
+                    <td>TAG + MASKING/ROW ACCESS POLICY</td>
+                    <td><span class="code-inline">SYSTEM$GET_TAG_ON_CURRENT_COLUMN('tag_name')</span></td>
                 </tr>
             </table>
+
+            <h3>Tag-Based Security Policies</h3>
+            <p>PlainID POP also discovers and manages Snowflake's tag-based security policies, enabling centralized governance through metadata tagging:</p>
+            
+            <div class="code">
+<pre># Example: Tag-Based Masking Policy Discovery
+-- Snowflake Tag-Based Policy
+CREATE TAG pii_classification;
+CREATE MASKING POLICY tag_based_pii_mask AS (val STRING)
+RETURNS STRING ->
+  CASE 
+    WHEN SYSTEM$GET_TAG_ON_CURRENT_COLUMN('pii_classification') = 'SENSITIVE'
+      AND CURRENT_ROLE() NOT IN ('DATA_STEWARD')
+    THEN '***MASKED***'
+    ELSE val
+  END;
+
+-- Apply tag to columns
+ALTER TABLE customer_data MODIFY COLUMN ssn SET TAG pii_classification = 'SENSITIVE';
+ALTER TAG pii_classification SET MASKING POLICY tag_based_pii_mask;</pre>
+            </div>
+
+            <h3>Policy Evaluation Order</h3>
+            <div class="alert info">
+                <strong>Important:</strong> When both row access policies and masking policies are applied to the same table:
+                <ol>
+                    <li><strong>Row Access Policies are evaluated first</strong> - Filters which rows the user can see</li>
+                    <li><strong>Masking Policies are evaluated second</strong> - Masks sensitive data in the returned rows</li>
+                    <li>If a column has both a direct masking policy and a tag-based masking policy, the direct policy takes precedence</li>
+                </ol>
+            </div>
         </section>
 
         <!-- Learn & Manage Modes -->
@@ -898,7 +984,7 @@ METADATA
                 </ul>
 
                 <div class="code">
-// Example: Discovered Snowflake Policy
+<pre>// Example: Discovered Snowflake Policy
 CREATE ROW ACCESS POLICY sales_region_policy
 AS (region_column VARCHAR) 
 RETURNS BOOLEAN ->
@@ -907,6 +993,10 @@ RETURNS BOOLEAN ->
     WHERE manager_id = CURRENT_USER() 
     AND region = region_column
   );
+
+// Applied to table using:
+ALTER TABLE sales_data 
+SET ROW ACCESS POLICY sales_region_policy ON (region);
 
 // Translated to PlainID Policy Structure
 {
@@ -920,7 +1010,8 @@ RETURNS BOOLEAN ->
       "region": "${row.region_column}"
     }
   }
-}</div>
+}</pre>
+                </div>
             </div>
 
             <div id="manage-mode" class="mode-content" style="display: none;">
@@ -929,6 +1020,10 @@ RETURNS BOOLEAN ->
                 
                 <div class="alert success">
                     <strong>Capability:</strong> Create, update, and delete policies in PlainID that are automatically deployed to Snowflake.
+                </div>
+
+                <div class="alert warning">
+                    <strong>Note:</strong> To modify an existing Snowflake policy, it must first be discovered in Learn Mode. PlainID can then manage it in Manage Mode. For policies with the same name, Snowflake requires dropping the old policy before creating a new one with different signatures.
                 </div>
 
                 <h4>Manage Mode Features:</h4>
@@ -943,7 +1038,7 @@ RETURNS BOOLEAN ->
 
                 <h4>Policy Deployment Example:</h4>
                 <div class="code">
-# PlainID Policy (Visual Editor)
+<pre># PlainID Policy (Visual Editor)
 Policy: "PII Data Protection"
 Target: CUSTOMER_DATA.PERSONAL_INFO
 Rules:
@@ -963,7 +1058,12 @@ RETURNS STRING ->
   END;
 
 ALTER TABLE customer_data.personal_info 
-MODIFY COLUMN ssn SET MASKING POLICY pii_protection_mask;</div>
+MODIFY COLUMN ssn SET MASKING POLICY pii_protection_mask;
+
+# To remove a policy (if needed):
+ALTER TABLE customer_data.personal_info 
+MODIFY COLUMN ssn UNSET MASKING POLICY;</pre>
+                </div>
             </div>
         </section>
 
@@ -974,13 +1074,15 @@ MODIFY COLUMN ssn SET MASKING POLICY pii_protection_mask;</div>
             <h3>Prerequisites</h3>
             <ul>
                 <li>Snowflake Account with ACCOUNTADMIN or SECURITYADMIN privileges</li>
+                <li>Snowflake Enterprise Edition or higher (required for Row Access Policies and Dynamic Data Masking)</li>
                 <li>Service Account for PlainID integration</li>
                 <li>PlainID Platform access with Orchestration Workspace enabled</li>
+                <li>Active Snowflake warehouse for discovery operations</li>
             </ul>
 
             <h3>Step 1: Create Snowflake Service Account</h3>
             <div class="code">
--- Create PlainID integration role
+<pre>-- Create PlainID integration role
 CREATE ROLE PLAINID_ORCHESTRATOR;
 
 -- Grant necessary privileges
@@ -991,8 +1093,15 @@ GRANT SELECT ON ALL TABLES IN SCHEMA TO ROLE PLAINID_ORCHESTRATOR;
 GRANT SELECT ON ALL VIEWS IN SCHEMA TO ROLE PLAINID_ORCHESTRATOR;
 
 -- Grant policy management privileges
-GRANT CREATE ROW ACCESS POLICY ON SCHEMA * TO ROLE PLAINID_ORCHESTRATOR;
-GRANT CREATE MASKING POLICY ON SCHEMA * TO ROLE PLAINID_ORCHESTRATOR;
+-- Option 1: Grant on specific schemas
+GRANT CREATE ROW ACCESS POLICY ON SCHEMA PUBLIC TO ROLE PLAINID_ORCHESTRATOR;
+GRANT CREATE MASKING POLICY ON SCHEMA PUBLIC TO ROLE PLAINID_ORCHESTRATOR;
+
+-- Option 2: Grant on all schemas in database (recommended)
+GRANT CREATE ROW ACCESS POLICY ON ALL SCHEMAS IN DATABASE TO ROLE PLAINID_ORCHESTRATOR;
+GRANT CREATE MASKING POLICY ON ALL SCHEMAS IN DATABASE TO ROLE PLAINID_ORCHESTRATOR;
+
+-- Grant apply privileges at account level
 GRANT APPLY ROW ACCESS POLICY ON ACCOUNT TO ROLE PLAINID_ORCHESTRATOR;
 GRANT APPLY MASKING POLICY ON ACCOUNT TO ROLE PLAINID_ORCHESTRATOR;
 
@@ -1001,7 +1110,8 @@ CREATE USER PLAINID_SERVICE_USER
   PASSWORD = 'secure_password'
   DEFAULT_ROLE = PLAINID_ORCHESTRATOR;
 
-GRANT ROLE PLAINID_ORCHESTRATOR TO USER PLAINID_SERVICE_USER;</div>
+GRANT ROLE PLAINID_ORCHESTRATOR TO USER PLAINID_SERVICE_USER;</pre>
+            </div>
 
             <h3>Step 2: Configure POP in PlainID</h3>
             <ol>
@@ -1012,7 +1122,7 @@ GRANT ROLE PLAINID_ORCHESTRATOR TO USER PLAINID_SERVICE_USER;</div>
             </ol>
 
             <div class="code">
-{
+<pre>{
   "displayName": "Snowflake Production POP",
   "connectionSettings": {
     "account": "mycompany.snowflakecomputing.com",
@@ -1030,15 +1140,26 @@ GRANT ROLE PLAINID_ORCHESTRATOR TO USER PLAINID_SERVICE_USER;</div>
     "includeRoles": true
   },
   "syncSettings": {
-    "mode": "learn",  // Start with learn mode
+    "mode": "learn",  // Always start with "learn" mode for initial discovery
     "syncInterval": "hourly",
-    "conflictResolution": "plainid_wins"
+    "conflictResolution": "plainid_wins"  // Options: "plainid_wins", "snowflake_wins", "manual"
   }
-}</div>
+}</pre>
+            </div>
 
             <h3>Step 3: Test Connection</h3>
             <div class="alert info">
-                Click <strong>Test Connection</strong> to verify PlainID can connect to your Snowflake account and has appropriate permissions.
+                Click <strong>Test Connection</strong> to verify PlainID can connect to your Snowflake account and has appropriate permissions. Ensure your warehouse is running before testing.
+            </div>
+            
+            <div class="code">
+<pre>-- Verify service account permissions in Snowflake
+SHOW GRANTS TO ROLE PLAINID_ORCHESTRATOR;
+SHOW GRANTS TO USER PLAINID_SERVICE_USER;
+
+-- Test warehouse access
+USE WAREHOUSE COMPUTE_WH;
+SELECT CURRENT_WAREHOUSE(), CURRENT_USER(), CURRENT_ROLE();</pre>
             </div>
         </section>
 
@@ -1048,6 +1169,10 @@ GRANT ROLE PLAINID_ORCHESTRATOR TO USER PLAINID_SERVICE_USER;</div>
             
             <h3>Automatic Discovery Flow</h3>
             <p>When a Snowflake POP is created, PlainID automatically initiates a discovery process:</p>
+
+            <div class="alert info">
+                <strong>Warehouse Requirement:</strong> Discovery operations require an active Snowflake warehouse. Ensure the warehouse specified in the POP configuration is running and the service account has USAGE privileges on it.
+            </div>
 
             <div class="architecture">
                 <div class="flow">
@@ -1114,7 +1239,7 @@ GRANT ROLE PLAINID_ORCHESTRATOR TO USER PLAINID_SERVICE_USER;</div>
 
             <h3>Manual Discovery Trigger</h3>
             <div class="code">
-# Trigger discovery manually from Orchestration Workspace
+<pre># Trigger discovery manually from Orchestration Workspace
 1. Navigate to Snowflake POP card
 2. Click three dots menu (⋮)
 3. Select "Discover Now"
@@ -1125,7 +1250,8 @@ POST /api/v1/orchestration/pop/{popId}/discover
 {
   "scope": "full",  // or "incremental"
   "notify": true
-}</div>
+}</pre>
+            </div>
         </section>
 
         <!-- Policy Resolution -->
@@ -1142,7 +1268,7 @@ POST /api/v1/orchestration/pop/{popId}/discover
 
             <h3>Resolution Request (Snowflake Context)</h3>
             <div class="code">
-{
+<pre>{
   "identity": {
     "type": "user",
     "id": "snowflake_user@company.com",
@@ -1167,11 +1293,12 @@ POST /api/v1/orchestration/pop/{popId}/discover
     "role": "ANALYST",
     "session_id": "sf_session_12345"
   }
-}</div>
+}</pre>
+            </div>
 
             <h3>Resolution Response</h3>
             <div class="code">
-{
+<pre>{
   "decision": "PERMIT",
   "nativePolicies": {
     "rowAccessPolicy": {
@@ -1192,13 +1319,14 @@ POST /api/v1/orchestration/pop/{popId}/discover
     ]
   },
   "deploymentInstructions": {
-    "applyRowPolicy": "ALTER TABLE analytics.sales.revenue_data ADD ROW ACCESS POLICY finance_region_policy ON (region)",
+    "applyRowPolicy": "ALTER TABLE analytics.sales.revenue_data SET ROW ACCESS POLICY finance_region_policy ON (region)",
     "applyMaskingPolicies": [
       "ALTER TABLE analytics.sales.revenue_data MODIFY COLUMN ssn SET MASKING POLICY pii_mask_policy",
       "ALTER TABLE analytics.sales.revenue_data MODIFY COLUMN salary SET MASKING POLICY salary_mask_policy"
     ]
   }
-}</div>
+}</pre>
+            </div>
         </section>
 
         <!-- Orchestration Workspace -->
@@ -1265,8 +1393,9 @@ POST /api/v1/orchestration/pop/{popId}/discover
             <h2>Monitoring & Auditing</h2>
             
             <h3>POP Activity Monitoring</h3>
+            <p>Example of activity log entry for policy deployment:</p>
             <div class="code">
-# Activity Log Entry Example
+<pre># Activity Log Entry Example
 {
   "timestamp": "2024-12-15T10:30:00Z",
   "popId": "snowflake-prod-pop",
@@ -1282,7 +1411,8 @@ POST /api/v1/orchestration/pop/{popId}/discover
       "affectedRows": 1500000
     }
   }
-}</div>
+}</pre>
+            </div>
 
             <h3>Audit Capabilities</h3>
             <ul>
@@ -1353,11 +1483,16 @@ POST /api/v1/orchestration/pop/{popId}/discover
                     <td>Test connection fails</td>
                     <td>Check network policies; verify warehouse is running</td>
                 </tr>
+                <tr>
+                    <td>Policy Syntax Errors</td>
+                    <td>"Cannot ADD policy" error when setting policies</td>
+                    <td>Use SET instead of ADD: ALTER TABLE ... SET ROW ACCESS POLICY ...</td>
+                </tr>
             </table>
 
             <h3>Debug Mode</h3>
             <div class="code">
-# Enable debug logging for POP
+<pre># Enable debug logging for POP
 {
   "popId": "snowflake-prod-pop",
   "settings": {
@@ -1368,16 +1503,22 @@ POST /api/v1/orchestration/pop/{popId}/discover
       "capturePerformanceMetrics": true
     }
   }
-}</div>
+}</pre>
+            </div>
         </section>
 
         <div class="alert success" style="margin-top: 3rem;">
             <strong>Best Practice:</strong> Start with Learn Mode to understand your existing Snowflake policies before enabling Manage Mode. This ensures a smooth transition to centralized policy management without disrupting existing access patterns.
         </div>
 
+        <div class="alert warning" style="margin-top: 1rem;">
+            <strong>Enterprise Edition Requirement:</strong> Snowflake Row Access Policies and Dynamic Data Masking require Enterprise Edition or higher. Ensure your Snowflake account meets this requirement before implementing PlainID POP integration.
+        </div>
+
         <div class="alert info" style="margin-top: 2rem;">
             <strong>Documentation Based On:</strong> PlainID Platform Documentation & Snowflake Integration Announcement (December 2024)<br>
             <strong>Pattern:</strong> Policy Orchestration Point (POP) for SaaS Authorization Management<br>
+            <strong>Snowflake Features:</strong> Row Access Policies, Dynamic Data Masking, Tag-Based Security (Enterprise Edition+)<br>
             <strong>Support:</strong> For production deployments, contact PlainID Technical Support for detailed implementation guidance.
         </div>
     </main>

@@ -6,6 +6,6 @@ Technical documentation for implementing Policy-Based Access Control (PBAC) in S
 
 This documentation provides comprehensive guidance for integrating PlainID's authorization platform with Snowflake, including:
 - System architecture and data flow
-- Component configuration (PAA, PDP, PIP)
+- Component configuration (POP)
 - Authorization patterns and policies
 - API reference and deployment guides
